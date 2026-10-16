@@ -1,6 +1,6 @@
 #include "Heis.h"
 
-static const unsigned long DOR_TID = 3000;  // ms døren står åpen
+static const unsigned long DOR_TID = 3000;
 
 Heis::Heis() {
   _tilstand = STAAR;
@@ -87,8 +87,8 @@ void Heis::oppdater(int etasjeNaa, long pos) {
 
     case DOR_AAPEN:
       {
-        if (tidITilstand < DOR_TID) {  // døren har ikke stått åpen lenge nok
-          break;                   // gjør ingenting denne runden
+        if (tidITilstand < DOR_TID) {  
+          break;                   
         }
 
         int over = _ko.nesteOver(etasjeNaa);

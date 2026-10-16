@@ -2,10 +2,13 @@
 #include "Display.h"
 #include "Regulator.h"
 #include "Heis.h"
+#include "Profil.h"
 
 Display display;
 Regulator regulator(6, 7);
 Heis heis;
+
+Profil profil(2000, 3000);
 
 unsigned long forrigeTid = 0;
 
@@ -13,6 +16,7 @@ void setup() {
   Serial.begin(115200);
 
   posisjonBegin();
+  profil.start(lesPosisjon());
   regulator.begin();
   display.begin();
   heis.begin();
@@ -33,6 +37,7 @@ void loop() {
 
   long maalPos = etasjePosisjon(heis.maalEtasje());
   long avstand = maalPos - pos;
+  long ref = profil.oppdater(maalPos, dt);
 
   int pil;
   if (avstand > TOLERANSE) {
@@ -44,7 +49,7 @@ void loop() {
   }
 
   display.vis(etasjeNaa, pil);
-  regulator.oppdater(avstand, pos, dt);
+  regulator.oppdater(ref - pos, pos, dt);
 
   Serial.print(maalPos);
   Serial.print(" ");
