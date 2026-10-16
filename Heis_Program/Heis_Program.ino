@@ -1,11 +1,11 @@
 #include "Posisjon.h"
 #include "Display.h"
 #include "Regulator.h"
-#include "Ko.h"
+#include "Heis.h"
 
 Display display;
 Regulator regulator(6, 7);
-Ko ko;
+Heis heis;
 
 unsigned long forrigeTid = 0;
 
@@ -15,7 +15,7 @@ void setup() {
   posisjonBegin();
   regulator.begin();
   display.begin();
-  ko.begin();
+  heis.begin();
 
   forrigeTid = millis();
 }
@@ -26,12 +26,12 @@ void loop() {
   float dt = (naa - forrigeTid) / 1000.0;
   forrigeTid = naa;
 
-  ko.oppdater();
-
   long pos = lesPosisjon();
   int etasjeNaa = naermesteEtasje(pos);
 
-  long maalPos = etasjePosisjon(ko.maalEtasje());
+  heis.oppdater(etasjeNaa,pos);
+
+  long maalPos = etasjePosisjon(heis.maalEtasje());
   long avstand = maalPos - pos;
 
   int pil;
@@ -52,5 +52,7 @@ void loop() {
   Serial.print(" ");
   Serial.print(regulator.fart());
   Serial.print(" ");
-  Serial.println(etasjeNaa);
+  Serial.print(etasjeNaa);
+  Serial.print(" ");
+  Serial.println(heis.tilstand());
 }
