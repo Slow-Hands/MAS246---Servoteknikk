@@ -37,7 +37,10 @@ void loop() {
 
   long maalPos = etasjePosisjon(heis.maalEtasje());
   long avstand = maalPos - pos;
+
   long ref = profil.oppdater(maalPos, dt);
+  bool ferdig = (ref == maalPos);
+  long folgefeil = ref - pos;
 
   int pil;
   if (avstand > TOLERANSE) {
@@ -49,15 +52,15 @@ void loop() {
   }
 
   display.vis(etasjeNaa, pil);
-  regulator.oppdater(ref - pos, pos, dt);
+  regulator.oppdater(folgefeil, pos, dt, ferdig);
 
-  Serial.print(maalPos);
+  Serial.print(ref);
   Serial.print(" ");
   Serial.print(pos);
   Serial.print(" ");
-  Serial.print(regulator.fart());
+  Serial.print(folgefeil);
   Serial.print(" ");
-  Serial.print(etasjeNaa);
+  Serial.print(regulator.fart());
   Serial.print(" ");
   Serial.println(heis.tilstand());
 }

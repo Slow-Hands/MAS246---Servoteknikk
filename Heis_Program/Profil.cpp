@@ -39,5 +39,11 @@ long Profil::oppdater(long maalPos, float dt) {
     _rampeFart = 0;                                               
   }
 
+
+
   return (long)_rampePos;                                         
+}
+
+float Profil::fart() {
+  return _rampeFart;
 }

@@ -7,7 +7,7 @@ class Regulator {
   public:
     Regulator(int retningPin, int fartPin);
     void begin();
-    void oppdater(long avstand, long pos, float dt);
+    void oppdater(long feil, long pos, float dt, bool ferdig);
     float fart();
 
   private:
@@ -18,6 +18,8 @@ class Regulator {
     float _integral;
     float _forrigePos;
     float _fartFilt;
+    float _forrigeFeil;
+    float _dFilt;
 };
 
 #endif

@@ -8,6 +8,7 @@ class Profil {
     Profil(float maksFart, float maksAkselerasjon);
     void start(long pos);
     long oppdater(long maalPos, float dt);
+    float fart();
 
   private:
     float _vMax;
