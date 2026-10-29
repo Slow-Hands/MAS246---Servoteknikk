@@ -10,6 +10,7 @@ class Display {
     void begin();                       
     void vis(int etasje, int pil);      
     void visMeny(int etasje, int pil);
+    void visVekt(int verdi, bool overvekt);
   
   private:                              
     LiquidCrystal _lcd;                 

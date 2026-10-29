@@ -3,14 +3,15 @@
 
 #include <Arduino.h>
 #include "Ko.h"
+#include "door.h"
 
 class Heis {
   public:
-    enum Tilstand { STAAR, KJORER_OPP, KJORER_NED, DOR_AAPEN };
+    enum Tilstand { STAAR, KJORER_OPP, KJORER_NED, DOR_AAPEN, DOR_AAPNER, DOR_LUKKER };
 
     Heis();
     void begin();
-    void oppdater(int etasjeNaa, long pos);
+    void oppdater(int etasjeNaa, long pos, Door& dor, bool overvekt);
     int maalEtasje();
     Tilstand tilstand();
     int valgtEtasje();
@@ -26,7 +27,8 @@ class Heis {
     Tilstand _tilstand;
     int _maalEtasje;
     unsigned long _tidInn;
-    int _retning;      
+    int _retning;  
+    int _videre;    
 };
 
 #endif
