@@ -13,6 +13,11 @@ class Heis {
     void oppdater(int etasjeNaa, long pos);
     int maalEtasje();
     Tilstand tilstand();
+    int valgtEtasje();
+    int valgtRetning();
+    bool visMeny();
+    
+
 
   private:
     void byttTil(Tilstand ny);

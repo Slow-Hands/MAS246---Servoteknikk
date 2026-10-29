@@ -9,16 +9,25 @@ class Ko {
     Ko();
     void begin();
     void oppdater();
-    int maalEtasje();
     bool erBestilt(int etasje);
-   void fjernBestilling(int etasje);
-   int  nesteOver(int etasje);     // nærmeste bestilte etasje over, eller -1
-   int  nesteUnder(int etasje);    // nærmeste bestilte etasje under, eller -1
+    bool skalBetjenes(int etasje, int retning);
+   void fjernBestilling(int etasje, int retning);
+   int  nesteStoppOver(int etasje);
+   int  nesteStoppUnder(int etasje);
+   void leggTilUtvendig(int etasje, int retning);
+   int valgtEtasje();
+    int valgtRetning();
+    bool visMeny();
 
   private:
-    int _maalEtasje;
     bool _forrigeKnapp[ANTALL_ETASJER];
-    bool _bestilt[ANTALL_ETASJER];
+    bool _bestiltInne[ANTALL_ETASJER];
+    bool _bestiltOpp[ANTALL_ETASJER];    
+    bool _bestiltNed[ANTALL_ETASJER]; 
+    int _valgtEtasje;
+    int _valgtRetning;
+    bool _joyXVarMidt;
+    bool _forrigeEncKnapp;  
+    bool _visMeny;
 };
-
 #endif

@@ -38,11 +38,11 @@ void Heis::oppdater(int etasjeNaa, long pos) {
   switch (_tilstand) {
     case STAAR:
       {
-        int over = _ko.nesteOver(etasjeNaa);
-        int under = _ko.nesteUnder(etasjeNaa);
+        int over = _ko.nesteStoppOver(etasjeNaa);
+        int under = _ko.nesteStoppUnder(etasjeNaa);
 
         if (_ko.erBestilt(etasjeNaa)) {
-          _ko.fjernBestilling(etasjeNaa);
+          _ko.fjernBestilling(etasjeNaa,0);
           byttTil(DOR_AAPEN);
         } else if (over != -1) {
           _maalEtasje = over;
@@ -57,53 +57,82 @@ void Heis::oppdater(int etasjeNaa, long pos) {
       }
     case KJORER_OPP:
       {
-        int over = _ko.nesteOver(etasjeNaa);  // nærmeste bestilling over der heisen er
+        int over = _ko.nesteStoppOver(etasjeNaa);
 
-        if (over != -1 && over < _maalEtasje) {  // fant noe, OG det er nærmere enn målet?
+        if (over != -1 && over < _maalEtasje) {
           _maalEtasje = over;
         }
 
         if (fremme) {
-          _ko.fjernBestilling(etasjeNaa);  // fjern bestillingen i målet
-          byttTil(DOR_AAPEN);              // bytt til DOR_AAPEN
+          int videre;
+          if (over != -1) {
+            videre = 1;
+          } else {
+            videre = 0;
+          }
+          _ko.fjernBestilling(etasjeNaa, videre);
+          byttTil(DOR_AAPEN);
         }
         break;
       }
 
     case KJORER_NED:
       {
-        int under = _ko.nesteUnder(etasjeNaa);  // nærmeste bestilling over der heisen er
+        int under = _ko.nesteStoppUnder(etasjeNaa);
 
-        if (under != -1 && under > _maalEtasje) {  // fant noe, OG det er nærmere enn målet?
+        if (under != -1 && under > _maalEtasje) {
           _maalEtasje = under;
         }
 
         if (fremme) {
-          _ko.fjernBestilling(etasjeNaa);  // fjern bestillingen i målet
-          byttTil(DOR_AAPEN);              // bytt til DOR_AAPEN
+          int videre;
+          if (under != -1) {
+            videre = -1;
+          } else {
+            videre = 0;
+          }
+          _ko.fjernBestilling(etasjeNaa, videre);
+          byttTil(DOR_AAPEN);
         }
         break;
       }
 
     case DOR_AAPEN:
       {
-        if (tidITilstand < DOR_TID) {  
-          break;                   
+        if (_ko.skalBetjenes(etasjeNaa , _retning)) {
+          _ko.fjernBestilling(etasjeNaa , _retning);
+          byttTil(DOR_AAPEN);
+          break;
+        }
+        if (tidITilstand < DOR_TID) {
+          break;
         }
 
-        int over = _ko.nesteOver(etasjeNaa);
-        int under = _ko.nesteUnder(etasjeNaa);
+        int over = _ko.nesteStoppOver(etasjeNaa);
+        int under = _ko.nesteStoppUnder(etasjeNaa);
 
-        if (_retning == 1 && over != -1) {  // kjørte opp, og flere over?
+        if (_retning == 1 && over != -1) {
           _maalEtasje = over;
           byttTil(KJORER_OPP);
-        } else if (_retning == -1 && under != -1) {  // kjørte ned, og flere under?
+        } else if (_retning == -1 && under != -1) {
           _maalEtasje = under;
           byttTil(KJORER_NED);
-        } else {  // ingenting mer i samme retning
+        } else {
           byttTil(STAAR);
         }
         break;
       }
   }
+}
+
+int Heis::valgtEtasje() {
+  return _ko.valgtEtasje();
+}
+
+int Heis::valgtRetning() {
+  return _ko.valgtRetning();
+}
+
+bool Heis::visMeny() {
+  return _ko.visMeny();
 }

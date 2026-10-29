@@ -8,9 +8,14 @@ Display display;
 Regulator regulator(6, 7);
 Heis heis;
 
-Profil profil(2000, 3000);
+Profil profil(1500, 2000);
 
 unsigned long forrigeTid = 0;
+// Logging for heislogg.py
+bool forrigeFerdig = true;          
+unsigned long turStart = 0;         
+int etterlogg = 0;                  
+const int ETTERLOGG_SAMPLER = 100;  
 
 void setup() {
   Serial.begin(115200);
@@ -33,7 +38,7 @@ void loop() {
   long pos = lesPosisjon();
   int etasjeNaa = naermesteEtasje(pos);
 
-  heis.oppdater(etasjeNaa,pos);
+  heis.oppdater(etasjeNaa, pos);
 
   long maalPos = etasjePosisjon(heis.maalEtasje());
   long avstand = maalPos - pos;
@@ -51,7 +56,12 @@ void loop() {
     pil = 0;
   }
 
-  display.vis(etasjeNaa, pil);
+  if (heis.visMeny()) {
+    display.visMeny(heis.valgtEtasje(), heis.valgtRetning());
+  } else {
+    display.vis(etasjeNaa, pil);
+  }
+
   regulator.oppdater(folgefeil, pos, dt, ferdig);
 
   Serial.print(ref);
@@ -63,4 +73,26 @@ void loop() {
   Serial.print(regulator.fart());
   Serial.print(" ");
   Serial.println(heis.tilstand());
+
+
+  // ---------- Logging for heislogg.py ----------
+  // En tur starter når profilen går fra ferdig til ikke ferdig (nytt mål)
+  if (!ferdig && forrigeFerdig) {
+    turStart = naa;
+    Serial.println("t_ms,ref,pos,v");
+  }
+
+  if (!ferdig) {
+    etterlogg = ETTERLOGG_SAMPLER;  // hold loggen åpen så lenge turen pågår
+  }
+
+  if (!ferdig || etterlogg > 0) {
+    Serial.print(naa - turStart);  Serial.print(',');
+    Serial.print(ref);             Serial.print(',');
+    Serial.print(pos);             Serial.print(',');
+    Serial.println(regulator.fart());
+    if (ferdig) etterlogg--;        // tell ned de ekstra samplene etter turen
+  }
+
+  forrigeFerdig = ferdig;
 }

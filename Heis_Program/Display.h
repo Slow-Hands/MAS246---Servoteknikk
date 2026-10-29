@@ -9,11 +9,13 @@ class Display {
     Display();                          
     void begin();                       
     void vis(int etasje, int pil);      
-
+    void visMeny(int etasje, int pil);
+  
   private:                              
     LiquidCrystal _lcd;                 
     int _forrigeEtasje;                 
-    int _forrigePil;                    
+    int _forrigePil; 
+    bool _forrigeVarMeny;                   
 };                                      
 
 #endif                                  

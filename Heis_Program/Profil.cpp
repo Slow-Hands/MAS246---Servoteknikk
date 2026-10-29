@@ -5,11 +5,20 @@ Profil::Profil(float maksFart, float maksAkselerasjon) {
   _aMax = maksAkselerasjon;
   _rampePos = 0;
   _rampeFart = 0;
+  _sum = 0;
+  _indeks = 0;
 }
 
 void Profil::start(long pos) {
   _rampePos = pos;
   _rampeFart = 0;
+
+  // Fyll bufferen med startposisjonen så snittet starter der heisen står
+  for (int i = 0; i < N; i++) {
+    _buffer[i] = pos;
+  }
+  _sum = pos * N;
+  _indeks = 0;
 }
 
 long Profil::oppdater(long maalPos, float dt) {
@@ -42,7 +51,13 @@ long Profil::oppdater(long maalPos, float dt) {
     _rampePos += steg;
   }
 
-  return (long)_rampePos;
+  long raa = (long)_rampePos;           // trapesreferansen som før
+
+  _sum += raa - _buffer[_indeks];       // legg til ny verdi, trekk fra eldste
+  _buffer[_indeks] = raa;               // ny verdi tar plassen til eldste
+  _indeks = (_indeks + 1) % N;          // neste plass, tilbake til 0 etter siste
+
+  return _sum / N;                      // glattet referanse = S-kurve
 }
 
 float Profil::fart() {

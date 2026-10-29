@@ -15,6 +15,12 @@ class Profil {
     float _aMax;
     float _rampePos;
     float _rampeFart;
+
+    // Glidende gjennomsnitt som gjør trapesprofilen om til en S-kurve
+    static const int N = 12;   // vindu: 12 × 20 ms = 0,24 s  ->  rykk ≈ aMax / 0,24
+    long _buffer[N];           // de N siste trapes-posisjonene
+    long _sum;                 // summen av alt i _buffer
+    int _indeks;               // plassen med den eldste verdien
 };
 
 #endif

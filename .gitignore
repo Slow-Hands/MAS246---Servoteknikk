@@ -66,3 +66,30 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# LaTeX build files
+*.aux
+*.bbl
+*.blg
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.toc
+
+# Python
+__pycache__/
+*.pyc
+
+# OS / editor
+Thumbs.db
+desktop.ini
+.vscode/
+
+# Rapporten ligger i Overleaf, ikke i git
+Rapport/
+
+# Plott genereres av heislogg.py, bare CSV-ene i git
+Målinger/*.pdf
+
+# Logge- og plotteverktøy på PC-en, ikke i git
+Verktoy/
