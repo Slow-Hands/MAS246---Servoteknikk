@@ -39,13 +39,13 @@ void Heis::oppdater(int etasjeNaa, long pos, Door& dor, bool overvekt) {
   switch (_tilstand) {
     case STAAR:
       {
-        if (!dor.isClosed() || overvekt) {   //
+        if (!dor.isClosed()) {
           break;
         }
         int over = _ko.nesteStoppOver(etasjeNaa);
         int under = _ko.nesteStoppUnder(etasjeNaa);
 
-        if (_ko.erBestilt(etasjeNaa)) {
+        if (_ko.erBestilt(etasjeNaa) || overvekt) {
           _videre = 0;
           dor.openDoor();
           byttTil(DOR_AAPNER);
@@ -64,7 +64,7 @@ void Heis::oppdater(int etasjeNaa, long pos, Door& dor, bool overvekt) {
       {
         int over = _ko.nesteStoppOver(etasjeNaa);
 
-        if (over != -1 && over < _maalEtasje) {
+        if (!fremme && over != -1 && (over < _maalEtasje || !_ko.skalBetjenes(_maalEtasje, 1))) {
           _maalEtasje = over;
         }
 
@@ -86,7 +86,7 @@ void Heis::oppdater(int etasjeNaa, long pos, Door& dor, bool overvekt) {
       {
         int under = _ko.nesteStoppUnder(etasjeNaa);
 
-        if (under != -1 && under > _maalEtasje) {
+        if (!fremme && under != -1 && (under > _maalEtasje || !_ko.skalBetjenes(_maalEtasje, -1))) {
           _maalEtasje = under;
         }
 

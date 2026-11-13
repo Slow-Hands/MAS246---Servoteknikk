@@ -24,7 +24,7 @@ class Door {
     static const int PIN_B_ENABLE = 67;
     static const int PIN_B_PHASE = 66; 
 
-    static const long OPEN_STEPS = 200;
+    static const long OPEN_STEPS = 100;
     static const long CLOSE_STEPS = 0;
     static const unsigned long STEP_INTERVAL = 10000; //microseconds between steps
 

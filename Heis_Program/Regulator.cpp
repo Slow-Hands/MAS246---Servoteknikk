@@ -1,7 +1,7 @@
 #include "Regulator.h"
 #include "Posisjon.h"
 
-static const float KP = 0.2, KI = 0.35, KD = 0.12;
+static const float KP = 0.4, KI = 0.35, KD = 0.12;
 static const float ALFA = 0.3;
 static const float I_GRENSE = 30;
 static const int FART_MAX = 120;
