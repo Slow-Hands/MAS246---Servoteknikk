@@ -6,7 +6,7 @@
 
 class Heis {
   public:
-    enum Tilstand { STAAR, KJORER_OPP, KJORER_NED, DOR_AAPEN };
+    enum Tilstand { STAAR, KJORER_OPP, KJORER_NED, DOR_AAPEN};
 
     Heis();
     void begin();
@@ -16,6 +16,8 @@ class Heis {
     int valgtEtasje();
     int valgtRetning();
     bool visMeny();
+    int count();
+    bool EMERGENCY();
     
 
 

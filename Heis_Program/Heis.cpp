@@ -136,3 +136,11 @@ int Heis::valgtRetning() {
 bool Heis::visMeny() {
   return _ko.visMeny();
 }
+
+int Heis::count() {
+  return _ko.count();
+}
+
+bool Heis::EMERGENCY() {
+  return _ko.EMERGENCY();
+}

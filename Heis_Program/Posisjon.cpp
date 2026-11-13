@@ -24,15 +24,7 @@ long lesPosisjon() {
 }
 
 int naermesteEtasje(long pos) {
-  int beste = 0;
-  long minsteAvvik = abs(pos - etasjeTerskel[0]);
-  for (int i = 1; i < ANTALL_ETASJER; i++) {
-    long avvik = abs(pos - etasjeTerskel[i]);
-    if (avvik < minsteAvvik) {
-      minsteAvvik = avvik;
-      beste = i;
-    }
-  }
+  int beste = (pos + 2000) / 4000;
   return beste;
 }
 

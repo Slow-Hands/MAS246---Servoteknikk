@@ -25,7 +25,13 @@ void Display::begin() {
   _lcd.createChar(0, pilOpp);                           
   _lcd.createChar(1, pilNed);                           
   _lcd.clear();                                         
-}                                                       
+}  
+                                                     
+void Display::EMERGENCY() {  
+  _lcd.clear();                                       
+  _lcd.setCursor(0, 0);                               
+  _lcd.print("EMERGENCY!"); 
+}
 
 void Display::vis(int etasje, int pil) {                
   if (etasje != _forrigeEtasje || pil != _forrigePil || _forrigeVarMeny) { 

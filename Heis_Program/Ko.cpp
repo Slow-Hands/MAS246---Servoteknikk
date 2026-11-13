@@ -5,10 +5,13 @@ static const int LED_PINS[ANTALL_ETASJER] = { 49, 48, 47, 46, 45, 44, 43, 42 };
 static const int JOY_X_PIN = { A1 };
 static const int JOY_Y_PIN = { A2 };
 static const int EncoderPIN = { 2 };
+static const int Encoder_A_PIN = { 18 };
+static const int Encoder_B_PIN = { 19 };
 static const int Joy_Hoy = 800;
 static const int Joy_Lav = 200;
 static const int Joy_Mid_Hoy = 600;
 static const int Joy_Mid_Lav = 400;
+static const int EMERGENCY_limit = 20;
 
 Ko::Ko() {
   for (int i = 0; i < ANTALL_ETASJER; i++) {
@@ -16,11 +19,19 @@ Ko::Ko() {
     _bestiltInne[i] = false;
     _bestiltOpp[i] = false;
     _bestiltNed[i] = false;
+    _bestiltEMERGENCY[i] = false;
   }
   _valgtEtasje = 0;
   _valgtRetning = 0;
+  _EMERGENCYcount = 0;
+  _resetEMERGENCY = 0;
   _joyXVarMidt = false;
   _forrigeEncKnapp = false;
+  _setEMERGENCY = false;
+  _naaEncA = digitalRead(Encoder_A_PIN);
+  _naaEncB = digitalRead(Encoder_B_PIN);
+  _forrigeEncA = digitalRead(Encoder_A_PIN);
+  _forrigeEncB = digitalRead(Encoder_B_PIN);
 }
 
 void Ko::begin() {
@@ -40,6 +51,38 @@ void Ko::oppdater() {
 
       _bestiltInne[i] = true;
       digitalWrite(LED_PINS[i], HIGH);
+    }
+
+    _naaEncA = digitalRead(Encoder_A_PIN);
+    _naaEncB = digitalRead(Encoder_B_PIN);
+
+    if (_naaEncA != _forrigeEncA && _naaEncB == _forrigeEncB) {
+      if (_naaEncA == _naaEncB) {
+        _EMERGENCYcount ++;
+      }
+      else {
+        _EMERGENCYcount --;
+      }
+    }
+    else if (_naaEncA == _forrigeEncA && _naaEncB != _forrigeEncB) {
+      if (_naaEncA == _naaEncB) {
+        _EMERGENCYcount --;
+      }
+      else {
+        _EMERGENCYcount ++;
+      }
+    }
+    
+    _forrigeEncA = _naaEncA;
+    _forrigeEncB = _naaEncB;
+
+    if (abs(_EMERGENCYcount) >= EMERGENCY_limit) {
+      for (int i = 0; i < ANTALL_ETASJER; i++) {
+        _bestiltEMERGENCY[i] = true;
+        digitalWrite(LED_PINS[i], LOW);
+      }
+      _EMERGENCYcount = 0;
+      _setEMERGENCY = true;
     }
 
 
@@ -83,9 +126,24 @@ void Ko::oppdater() {
   bool encNaa = digitalRead(EncoderPIN);
 
   if (encNaa == LOW && _forrigeEncKnapp == HIGH) {
-    leggTilUtvendig(_valgtEtasje, _valgtRetning);
-    _valgtRetning = 0;
-    _visMeny = false;
+    if (_setEMERGENCY == false) {
+      leggTilUtvendig(_valgtEtasje, _valgtRetning);
+      _valgtRetning = 0;
+      _visMeny = false;
+    }
+    else {
+      _resetEMERGENCY ++;
+      if (_resetEMERGENCY == 2) {
+        _resetEMERGENCY = 0;
+        _setEMERGENCY = false;
+        for (int i = 0; i < ANTALL_ETASJER; i++) {
+          _bestiltInne[i] = false;
+          _bestiltOpp[i] = false;
+          _bestiltNed[i] = false;
+          _bestiltEMERGENCY[i] = false;
+        }
+      }
+    }
   }
 
   _forrigeEncKnapp = encNaa;
@@ -93,7 +151,7 @@ void Ko::oppdater() {
 
 
 bool Ko::erBestilt(int etasje) {
-  return _bestiltInne[etasje] == true || _bestiltOpp[etasje] == true || _bestiltNed[etasje] == true;
+  return _bestiltInne[etasje] == true || _bestiltOpp[etasje] == true || _bestiltNed[etasje] == true || _bestiltEMERGENCY[etasje] == true;
 }
 
 void Ko::fjernBestilling(int etasje, int retning) {
@@ -130,7 +188,7 @@ void Ko::leggTilUtvendig(int etasje, int retning) {
 int Ko::nesteStoppOver(int etasje) {
   int snuEtasje = -1;
   for (int i = etasje + 1; i < ANTALL_ETASJER; i++) {
-    if (_bestiltInne[i] || _bestiltOpp[i]) {
+    if (_bestiltInne[i] || _bestiltOpp[i] || _bestiltEMERGENCY[i]) {
       return i;
     }
     if (erBestilt(i)) {
@@ -143,7 +201,7 @@ int Ko::nesteStoppOver(int etasje) {
 int Ko::nesteStoppUnder(int etasje) {
   int snuEtasje = -1;
   for (int i = etasje - 1; i >= 0; i--) {
-    if (_bestiltInne[i] || _bestiltNed[i]) {
+    if (_bestiltInne[i] || _bestiltNed[i] || _bestiltEMERGENCY[i]) {
       return i;
     }
     if (erBestilt(i)) {
@@ -155,11 +213,11 @@ int Ko::nesteStoppUnder(int etasje) {
 
 bool Ko::skalBetjenes(int etasje, int retning) {
   if (retning == 1) {
-    return _bestiltOpp[etasje] == true  || _bestiltInne[etasje] == true;
+    return _bestiltOpp[etasje] == true  || _bestiltInne[etasje] == true || _bestiltEMERGENCY[etasje] == true;
   } else if (retning == -1) {
-    return _bestiltNed[etasje] == true || _bestiltInne[etasje] == true;
+    return _bestiltNed[etasje] == true || _bestiltInne[etasje] == true || _bestiltEMERGENCY[etasje] == true;
   } else {
-    return _bestiltInne[etasje] == true  || _bestiltOpp[etasje] == true || _bestiltNed[etasje] == true;
+    return _bestiltInne[etasje] == true  || _bestiltOpp[etasje] == true || _bestiltNed[etasje] == true || _bestiltEMERGENCY[etasje] == true;
   }
 }
 
@@ -173,4 +231,12 @@ int Ko::valgtRetning() {
 
 bool Ko::visMeny() {
   return _visMeny;
+}
+
+int Ko::count() {
+  return _EMERGENCYcount;
+}
+
+bool Ko::EMERGENCY() {
+  return _setEMERGENCY;
 }

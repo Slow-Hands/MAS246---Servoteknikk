@@ -56,10 +56,15 @@ void loop() {
     pil = 0;
   }
 
-  if (heis.visMeny()) {
-    display.visMeny(heis.valgtEtasje(), heis.valgtRetning());
-  } else {
-    display.vis(etasjeNaa, pil);
+  if (heis.EMERGENCY()) {
+    display.EMERGENCY();
+  } 
+  else {
+    if (heis.visMeny()) {
+      display.visMeny(heis.valgtEtasje(), heis.valgtRetning());
+    } else {
+      display.vis(etasjeNaa, pil);
+    }
   }
 
   regulator.oppdater(folgefeil, pos, dt, ferdig);
@@ -71,6 +76,8 @@ void loop() {
   Serial.print(folgefeil);
   Serial.print(" ");
   Serial.print(regulator.fart());
+  Serial.print(" ");
+  Serial.print(heis.count());
   Serial.print(" ");
   Serial.println(heis.tilstand());
 
