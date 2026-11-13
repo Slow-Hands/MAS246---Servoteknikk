@@ -3,12 +3,15 @@
 #include "Regulator.h"
 #include "Heis.h"
 #include "Profil.h"
+#include "door.h"
+#include "Vekt.h"    
 
 Display display;
 Regulator regulator(6, 7);
 Heis heis;
-
-Profil profil(1500, 2000);
+Door door;
+Profil profil(1500, 2000);  
+Vekt vekt(A0, 3300);
 
 unsigned long forrigeTid = 0;
 // Logging for heislogg.py
@@ -25,11 +28,14 @@ void setup() {
   regulator.begin();
   display.begin();
   heis.begin();
+  door.begin();
+  
 
   forrigeTid = millis();
 }
 
 void loop() {
+  door.update();
   unsigned long naa = millis();
   if (naa - forrigeTid < 20) return;
   float dt = (naa - forrigeTid) / 1000.0;
@@ -38,7 +44,7 @@ void loop() {
   long pos = lesPosisjon();
   int etasjeNaa = naermesteEtasje(pos);
 
-  heis.oppdater(etasjeNaa, pos);
+  heis.oppdater(etasjeNaa, pos, door, vekt.overvekt());
 
   long maalPos = etasjePosisjon(heis.maalEtasje());
   long avstand = maalPos - pos;
@@ -56,15 +62,17 @@ void loop() {
     pil = 0;
   }
 
+
   if (heis.EMERGENCY()) {
     display.EMERGENCY();
-  } 
-  else {
+  } else {
     if (heis.visMeny()) {
       display.visMeny(heis.valgtEtasje(), heis.valgtRetning());
     } else {
       display.vis(etasjeNaa, pil);
+      display.visVekt(vekt.kg(), vekt.overvekt());
     }
+
   }
 
   regulator.oppdater(folgefeil, pos, dt, ferdig);

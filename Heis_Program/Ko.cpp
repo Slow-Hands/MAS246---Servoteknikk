@@ -11,7 +11,7 @@ static const int Joy_Hoy = 800;
 static const int Joy_Lav = 200;
 static const int Joy_Mid_Hoy = 600;
 static const int Joy_Mid_Lav = 400;
-static const int EMERGENCY_limit = 20;
+static const int EMERGENCY_limit = 8;
 
 Ko::Ko() {
   for (int i = 0; i < ANTALL_ETASJER; i++) {
@@ -81,7 +81,6 @@ void Ko::oppdater() {
         _bestiltEMERGENCY[i] = true;
         digitalWrite(LED_PINS[i], LOW);
       }
-      _EMERGENCYcount = 0;
       _setEMERGENCY = true;
     }
 
@@ -136,6 +135,7 @@ void Ko::oppdater() {
       if (_resetEMERGENCY == 2) {
         _resetEMERGENCY = 0;
         _setEMERGENCY = false;
+        _EMERGENCYcount = 0;
         for (int i = 0; i < ANTALL_ETASJER; i++) {
           _bestiltInne[i] = false;
           _bestiltOpp[i] = false;

@@ -88,8 +88,11 @@ desktop.ini
 # Rapporten ligger i Overleaf, ikke i git
 Rapport/
 
-# Plott genereres av heislogg.py, bare CSV-ene i git
-Målinger/*.pdf
+# Målinger ligger bare lokalt, ikke i git
+Målinger/
 
 # Logge- og plotteverktøy på PC-en, ikke i git
 Verktoy/
+
+# Testprogrammer fra Leon-branchen, bare til referanse
+Referanse/

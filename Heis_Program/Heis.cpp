@@ -7,6 +7,7 @@ Heis::Heis() {
   _maalEtasje = 0;
   _tidInn = 0;
   _retning = 0;
+  _videre = 0;
 }
 
 void Heis::begin() {
@@ -29,7 +30,7 @@ Heis::Tilstand Heis::tilstand() {
   return _tilstand;
 }
 
-void Heis::oppdater(int etasjeNaa, long pos) {
+void Heis::oppdater(int etasjeNaa, long pos, Door& dor, bool overvekt) {
   _ko.oppdater();
 
   bool fremme = abs(pos - etasjePosisjon(_maalEtasje)) < TOLERANSE;
@@ -38,12 +39,16 @@ void Heis::oppdater(int etasjeNaa, long pos) {
   switch (_tilstand) {
     case STAAR:
       {
+        if (!dor.isClosed()) {
+          break;
+        }
         int over = _ko.nesteStoppOver(etasjeNaa);
         int under = _ko.nesteStoppUnder(etasjeNaa);
 
-        if (_ko.erBestilt(etasjeNaa)) {
-          _ko.fjernBestilling(etasjeNaa,0);
-          byttTil(DOR_AAPEN);
+        if (_ko.erBestilt(etasjeNaa) || overvekt) {
+          _videre = 0;
+          dor.openDoor();
+          byttTil(DOR_AAPNER);
         } else if (over != -1) {
           _maalEtasje = over;
           byttTil(KJORER_OPP);
@@ -59,7 +64,7 @@ void Heis::oppdater(int etasjeNaa, long pos) {
       {
         int over = _ko.nesteStoppOver(etasjeNaa);
 
-        if (over != -1 && over < _maalEtasje) {
+        if (!fremme && over != -1 && (over < _maalEtasje || !_ko.skalBetjenes(_maalEtasje, 1))) {
           _maalEtasje = over;
         }
 
@@ -70,8 +75,9 @@ void Heis::oppdater(int etasjeNaa, long pos) {
           } else {
             videre = 0;
           }
-          _ko.fjernBestilling(etasjeNaa, videre);
-          byttTil(DOR_AAPEN);
+          _videre = videre;
+          dor.openDoor();
+          byttTil(DOR_AAPNER);
         }
         break;
       }
@@ -80,7 +86,7 @@ void Heis::oppdater(int etasjeNaa, long pos) {
       {
         int under = _ko.nesteStoppUnder(etasjeNaa);
 
-        if (under != -1 && under > _maalEtasje) {
+        if (!fremme && under != -1 && (under > _maalEtasje || !_ko.skalBetjenes(_maalEtasje, -1))) {
           _maalEtasje = under;
         }
 
@@ -91,22 +97,53 @@ void Heis::oppdater(int etasjeNaa, long pos) {
           } else {
             videre = 0;
           }
-          _ko.fjernBestilling(etasjeNaa, videre);
-          byttTil(DOR_AAPEN);
+          _videre = videre;
+          dor.openDoor();
+          byttTil(DOR_AAPNER);
         }
         break;
       }
 
     case DOR_AAPEN:
       {
-        if (_ko.skalBetjenes(etasjeNaa , _retning)) {
-          _ko.fjernBestilling(etasjeNaa , _retning);
+        if (_ko.skalBetjenes(etasjeNaa, _retning)) {   
+          _ko.fjernBestilling(etasjeNaa, _retning);
+          byttTil(DOR_AAPEN);                          
+          break;
+        }
+        if (overvekt) {                                
+          byttTil(DOR_AAPEN);                          
+          break;
+        }
+        if (tidITilstand < DOR_TID) {                  
+          break;
+        }
+        dor.closeDoor();   
+        byttTil(DOR_LUKKER);
+        break;
+      }
+
+    case DOR_AAPNER:
+      {
+        if (dor.isOpen()) {
+          _ko.fjernBestilling(etasjeNaa, _videre);
           byttTil(DOR_AAPEN);
+        }
+        break;
+      }
+
+    case DOR_LUKKER:
+      {
+        if (_ko.skalBetjenes(etasjeNaa, _retning) || overvekt) {
+          _videre = _retning;
+          dor.openDoor();
+          byttTil(DOR_AAPNER);
           break;
         }
-        if (tidITilstand < DOR_TID) {
+        if (!dor.isClosed()) {  
           break;
         }
+
 
         int over = _ko.nesteStoppOver(etasjeNaa);
         int under = _ko.nesteStoppUnder(etasjeNaa);
@@ -120,6 +157,8 @@ void Heis::oppdater(int etasjeNaa, long pos) {
         } else {
           byttTil(STAAR);
         }
+        break;
+
         break;
       }
   }
@@ -144,3 +183,4 @@ int Heis::count() {
 bool Heis::EMERGENCY() {
   return _ko.EMERGENCY();
 }
+
