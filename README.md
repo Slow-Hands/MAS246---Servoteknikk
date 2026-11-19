@@ -41,7 +41,10 @@ of Hoang [2] (REQ 1–16, SAF 8).
 | Floor 0 → 2 | 6.18 s | 6.68 s | 147 counts | 0 | 3 counts |
 
 <p align="center">
-  <img src="docs/images/trip_0_to_7.png" alt="Position, velocity and tracking error for the trip from floor 0 to 7" width="480">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/dark/trip_0_to_7.png">
+    <img src="docs/images/light/trip_0_to_7.png" alt="Position, velocity and tracking error for the trip from floor 0 to 7" width="480">
+  </picture>
   <br><em>Trip from floor 0 to 7: the measured position follows the S-curve reference without overshoot.</em>
 </p>
 
@@ -83,7 +86,10 @@ Each class has one job. `Heis` and `Ko` decide **where to go**, while
 `Profil` and `Regulator` decide **how to move**.
 
 <p align="center">
-  <img src="docs/images/uml_class_diagram.png" alt="UML class diagram" width="900">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/dark/uml_class_diagram.png">
+    <img src="docs/images/light/uml_class_diagram.png" alt="UML class diagram" width="900">
+  </picture>
 </p>
 
 ### Main loop
@@ -94,13 +100,19 @@ the motor output. The door stepper is updated in every pass of `loop()`,
 outside the 20 ms timing, because it needs a step every 10 ms.
 
 <p align="center">
-  <img src="docs/images/sequence_diagram.png" alt="UML sequence diagram of one pass of loop()" width="900">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/dark/sequence_diagram.png">
+    <img src="docs/images/light/sequence_diagram.png" alt="UML sequence diagram of one pass of loop()" width="900">
+  </picture>
 </p>
 
 ### State machine
 
 <p align="center">
-  <img src="docs/images/state_machine.png" alt="State machine of the elevator" width="560">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/dark/state_machine.png">
+    <img src="docs/images/light/state_machine.png" alt="State machine of the elevator" width="560">
+  </picture>
 </p>
 
 The cabin can only leave a floor from `STAAR` or `DOR_LUKKER`, and only when
@@ -116,7 +128,10 @@ before turning around. The search below is symmetric.
 ### Control loop
 
 <p align="center">
-  <img src="docs/images/control_loop.png" alt="Control loop" width="620">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/dark/control_loop.png">
+    <img src="docs/images/light/control_loop.png" alt="Control loop" width="620">
+  </picture>
 </p>
 
 The trapezoidal ramp is filtered by a moving average over 12 samples
