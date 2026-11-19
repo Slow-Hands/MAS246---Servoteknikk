@@ -142,6 +142,30 @@ jerk to about 8.3 m/s³.
 
 ## Hardware
 
+Everything runs on the MAS246 laboratory board shown at the top, so no
+extra wiring is needed.
+
+### Component list
+
+| Qty | Component | Details | Used for |
+|---:|---|---|---|
+| 1 | Arduino Mega 2560 Rev3 | ATmega2560, 16 MHz | Runs the elevator program |
+| 1 | Geared DC motor | 12 V supply | Moves the cabin |
+| 1 | DRV8840 H-bridge | Direction + PWM, duty cycle limited to 120/255 | Drives the DC motor |
+| 1 | Quadrature encoder | Hall effect, 16 lines on the motor shaft, 2× decoding | Measures the cabin position |
+| 1 | Bipolar stepper motor | Full-step mode, 100 steps from closed to open | Opens and closes the door |
+| 1 | DRV8813 stepper driver | Dual H-bridge | Drives the stepper motor |
+| 1 | MCP4922 DAC | 12-bit, two channels | Sets the stepper current |
+| 8 | Push buttons | Internal pull-up | Floor buttons in the cabin |
+| 8 | LEDs | One per floor | Shows queued floors |
+| 1 | Joystick | Two analog axes | Selects floor and direction for hall calls |
+| 1 | Rotary encoder with push button | Two channels + button | Confirms hall calls, emergency mode and reset |
+| 1 | Potentiometer | Scaled to 0–5000 kg | Simulates the passenger load |
+| 1 | LCD 16×2 | 4-bit mode, backlight | Floor, direction arrow, load and menu |
+| 1 | USB cable | 115 200 baud serial | Upload and logging |
+
+### Pin mapping
+
 | Component | Function | Pins |
 |---|---|---|
 | DC motor + DRV8840 | Moves the cabin | DIR 6, PWM 7 |
