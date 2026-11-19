@@ -4,6 +4,10 @@
 ![C++](https://img.shields.io/badge/language-C%2B%2B-00599C?logo=cplusplus&logoColor=white)
 ![University of Agder](https://img.shields.io/badge/UiA-MAS246%20autumn%202026-555)
 
+<p align="center">
+  <img src="docs/images/elevator_module.png" alt="The MAS246 elevator module" width="560">
+</p>
+
 A scaled eight-floor elevator controlled by an Arduino Mega 2560. The cabin
 travels along a jerk-limited **S-curve**, a **plain PID controller** tracks the
 reference, and a **collective queue** serves every request in the current
@@ -35,6 +39,11 @@ of Hoang [2] (REQ 1–16, SAF 8).
 |---|---:|---:|---:|---:|---:|
 | Floor 0 → 7 | 19.48 s | 20.02 s | 150 counts | 0 | 0 counts |
 | Floor 0 → 2 | 6.18 s | 6.68 s | 147 counts | 0 | 3 counts |
+
+<p align="center">
+  <img src="docs/images/trip_0_to_7.png" alt="Position, velocity and tracking error for the trip from floor 0 to 7" width="480">
+  <br><em>Trip from floor 0 to 7: the measured position follows the S-curve reference without overshoot.</em>
+</p>
 
 ---
 
@@ -73,52 +82,9 @@ open. The door then stays open for 3 s.
 Each class has one job. `Heis` and `Ko` decide **where to go**, while
 `Profil` and `Regulator` decide **how to move**.
 
-```mermaid
-classDiagram
-    direction LR
-    class Heis_Program {
-        +setup()
-        +loop()
-    }
-    class Heis {
-        -_tilstand: Tilstand
-        -_maalEtasje: int
-        +oppdater(int, long, Door, bool)
-        +maalEtasje() int
-    }
-    class Ko {
-        -_bestiltInne: bool[8]
-        -_bestiltOpp: bool[8]
-        -_bestiltNed: bool[8]
-        +nesteStoppOver(int) int
-        +nesteStoppUnder(int) int
-    }
-    class Profil {
-        +oppdater(long, float) long
-    }
-    class Regulator {
-        +oppdater(long, long, float, bool)
-    }
-    class Door {
-        +openDoor()
-        +closeDoor()
-        +update()
-    }
-    class Vekt {
-        +overvekt() bool
-    }
-    class Display {
-        +vis(int, int)
-        +visVekt(int, bool)
-    }
-    Heis_Program --> Heis
-    Heis_Program --> Profil
-    Heis_Program --> Regulator
-    Heis_Program --> Door
-    Heis_Program --> Vekt
-    Heis_Program --> Display
-    Heis --> Ko : _ko
-```
+<p align="center">
+  <img src="docs/images/uml_class_diagram.png" alt="UML class diagram" width="900">
+</p>
 
 ### Main loop
 
@@ -127,24 +93,15 @@ updates the state machine, generates the reference, updates the LCD and sets
 the motor output. The door stepper is updated in every pass of `loop()`,
 outside the 20 ms timing, because it needs a step every 10 ms.
 
+<p align="center">
+  <img src="docs/images/sequence_diagram.png" alt="UML sequence diagram of one pass of loop()" width="900">
+</p>
+
 ### State machine
 
-```mermaid
-stateDiagram-v2
-    [*] --> STAAR
-    STAAR --> KJORER_OPP : stop above
-    STAAR --> KJORER_NED : stop below
-    STAAR --> DOR_AAPNER : call at this floor / overload
-    KJORER_OPP --> DOR_AAPNER : arrived (±5 counts)
-    KJORER_NED --> DOR_AAPNER : arrived (±5 counts)
-    DOR_AAPNER --> DOR_AAPEN : door fully open
-    DOR_AAPEN --> DOR_AAPEN : new call here / overload → restart timer
-    DOR_AAPEN --> DOR_LUKKER : 3 s
-    DOR_LUKKER --> DOR_AAPNER : new call here / overload → reopen
-    DOR_LUKKER --> KJORER_OPP : door closed, stop above
-    DOR_LUKKER --> KJORER_NED : door closed, stop below
-    DOR_LUKKER --> STAAR : door closed, nothing ahead
-```
+<p align="center">
+  <img src="docs/images/state_machine.png" alt="State machine of the elevator" width="560">
+</p>
 
 The cabin can only leave a floor from `STAAR` or `DOR_LUKKER`, and only when
 the door is closed, so the door is never open while the cabin moves.
@@ -158,16 +115,9 @@ before turning around. The search below is symmetric.
 
 ### Control loop
 
-```mermaid
-flowchart LR
-    xt([target x_t]) --> P["S-curve<br/>(ramp + MA)"]
-    P -- r --> S((Σ))
-    S -- e --> C["PID + AW"]
-    C -- u --> Sat["Sat. ±120"]
-    Sat --> M["Motor + driver"]
-    M --> x([position x])
-    M -. encoder .-> S
-```
+<p align="center">
+  <img src="docs/images/control_loop.png" alt="Control loop" width="620">
+</p>
 
 The trapezoidal ramp is filtered by a moving average over 12 samples
 (0.24 s), which turns the steps in acceleration into ramps and limits the
